@@ -8,6 +8,7 @@ use scripting additions
 --   * 点击时有选中项/拖放   → 文件夹用其本身，文件用其所在目录
 --   * 没有访达窗口          → 回退到主目录
 --   * 打开 Terminal.app 新窗口: cd <目录> && pi（不加 exit，pi 退出后 shell 保留）
+--   * pi 路径解析: 优先 PATH，回退托管安装目录 ~/.pi/agent/bin，兼容旧 npm 全局目录
 --   * 新窗口最大化（zoom 铺满可视区，非全屏；保留菜单栏/Dock）
 --
 -- 改用 iTerm2: 把 launchPi 的 tell 块换成:
@@ -55,9 +56,11 @@ end screenVisibleBounds
 
 on launchPi(thePath)
 	set vb to screenVisibleBounds()
+	-- pi 可执行文件解析：优先 PATH（含 /usr/local/bin 旧 npm 全局），回退 ~/.pi/agent/bin（托管安装）
+	set shellCmd to "cd " & quoted form of thePath & " && { PI_BIN=$(command -v pi 2>/dev/null || printf '%s' \"$HOME/.pi/agent/bin/pi\"); if [ -x \"$PI_BIN\" ]; then \"$PI_BIN\"; else echo '错误: 找不到 pi（已查 PATH 与 ~/.pi/agent/bin）'; fi; }"
 	tell application "Terminal"
 		activate
-		do script "cd " & quoted form of thePath & " && pi"
+		do script shellCmd
 		-- 最大化 = 铺满可视区（等价 Option+点绿按钮，不会进入全屏）
 		set bounds of front window to vb
 	end tell
