@@ -14,6 +14,7 @@
 - 点击时无选中项 → 用最前访达窗口的目录
 - 点击时有选中项 → 文件夹用其本身，文件用其所在目录
 - 没有访达窗口 → 回退到主目录
+- pi 路径解析：优先 PATH，回退 `~/.pi/agent/bin`（pi 托管安装目录），找不到时终端内提示错误
 - 新终端窗口最大化（铺满可视区，非全屏；保留菜单栏/Dock）
 - pi 是 TUI，退出后 shell 保留
 
@@ -24,7 +25,7 @@
 GRAY=6E6E73 ./build.sh      # 深一档的灰
 ```
 
-流程：拉取官方 SVG（离线用 `assets/pi-logo-official.svg` 兜底）→ 本地改色 →
+流程：拉取官方 SVG（离线用 `assets/pi-logo-official.svg` 兜底）→ 本地改色（兼容 `<style>` 类名与 path 内联 `fill` 两种配色格式）→ 
 `scripts/make_icon.swift`（NSImage 渲染 SVG，需 macOS 11+）渲染 iconset 全尺寸 →
 `iconutil` 打包 icns → `osacompile` 编译 `src/pi-launcher.applescript` → 覆盖图标 → 安装。
 

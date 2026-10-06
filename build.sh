@@ -26,6 +26,7 @@ else
 fi
 
 # ── 2. 去掉自适应配色，改为固定灰色（保留透明底） ─────────────────────
+# 兼容两种 logo 格式: <style> 类名配色(旧) / path 内联 fill 配色(新版多彩 logo)
 python3 - "$GRAY" <<'PYEOF'
 import re, sys
 gray = sys.argv[1]
@@ -34,6 +35,7 @@ svg = open(path).read()
 svg = re.sub(r"<style>.*?</style>",
              f"<style>.logo-mark {{ fill: #{gray}; }}</style>",
              svg, flags=re.S)
+svg = re.sub(r'fill="#[0-9A-Fa-f]{3,8}"', f'fill="#{gray}"', svg)
 open(path, "w").write(svg)
 PYEOF
 echo "🎨 已改色为灰色 #$GRAY"
